@@ -37,6 +37,7 @@ class CookbookLayout extends StatelessWidget {
                 OutlinedButton.icon(
                   onPressed: cookBookButton,
                   style: OutlinedButton.styleFrom(
+                    alignment: Alignment.centerLeft,
                     shape: RoundedRectangleBorder(),
                     padding: const EdgeInsets.all(25),
                   ),
@@ -49,6 +50,7 @@ class CookbookLayout extends StatelessWidget {
                 OutlinedButton.icon(
                   onPressed: addRecipe,
                   style: OutlinedButton.styleFrom(
+                    alignment: Alignment.centerLeft,
                     shape: RoundedRectangleBorder(),
                     padding: const EdgeInsets.all(25),
                   ),
@@ -61,6 +63,7 @@ class CookbookLayout extends StatelessWidget {
                 OutlinedButton.icon(
                   onPressed: shoppingList,
                   style: OutlinedButton.styleFrom(
+                    alignment: Alignment.centerLeft,
                     shape: RoundedRectangleBorder(),
                     padding: const EdgeInsets.all(25),
                   ),
