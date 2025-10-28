@@ -17,11 +17,6 @@ class _CookbookPageState extends State<CookbookPage> {
                 child: 
                     Text('Cookbook is empty'),
                 ),
-            floatingActionButton: FloatingActionButton(
-                onPressed: () {},
-                tooltip: 'Add item',
-                child: const Icon(Icons.add_shopping_cart),
-            ),
         );
     }
 }

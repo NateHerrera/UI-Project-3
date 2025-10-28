@@ -3,29 +3,11 @@ import 'package:cookbook/cookbook.dart';
 import 'package:cookbook/shoppingList.dart';
 import 'package:flutter/material.dart';
 
-void main() {
-    runApp(const MainApp());
-}
+IconData dayThemeIcon = Icons.light_mode_sharp;
+IconData nightThemeIcon = Icons.dark_mode_sharp;
 
-class MainApp extends StatelessWidget {
-    const MainApp({super.key});
-
-    @override
-    Widget build(BuildContext context) {
-        return const MaterialApp(
-            debugShowCheckedModeBanner: false,
-            title: 'Cookbook',
-            home: CookbookScaffold(),
-        );
-    }
-}
-
-class CookbookScaffold extends StatefulWidget {
-    const CookbookScaffold({super.key});
-
-    @override
-    State<CookbookScaffold> createState() => _CookbookScaffold();
-}
+Color offBlack = Color.fromARGB(255, 34, 34, 59);
+Color offWhite =  Color.fromARGB(255, 242, 233, 228);
 
 class PageWidget {
     final int index;
@@ -36,7 +18,67 @@ class PageWidget {
     PageWidget({required this.index, required this.page, required this.navText, required this.navIcon}); 
 }
 
-class _CookbookScaffold extends State<CookbookScaffold> {
+class Recipe {
+    final String name;
+    final List<String> instructions;
+    final List<String> ingredients;
+
+    Recipe({required this.name, required this.instructions, required this.ingredients});
+}
+
+void main() {
+    runApp(const MainApp());
+}
+
+class MainApp extends StatefulWidget {
+    const MainApp({super.key});
+
+    @override
+    State<MainApp> createState() => _MainAppState();
+}
+
+class _MainAppState extends State<MainApp> {
+    // Theme toggling is handled at the MainApp level
+    // Theme toggle button rebuilds main app state.
+    ThemeMode _themeMode = ThemeMode.light;
+    IconData _themeIcon = dayThemeIcon;
+
+    void toggleTheme() {
+        setState(() {
+            if (_themeMode == ThemeMode.light) {
+                _themeMode = ThemeMode.dark;
+                _themeIcon = nightThemeIcon;
+            } else {
+                _themeMode = ThemeMode.light;
+                _themeIcon = dayThemeIcon;
+            }
+        });
+    }
+
+    @override
+    Widget build(BuildContext context) {
+        return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: 'Cookbook',
+            theme: ThemeData(colorSchemeSeed: offWhite),
+            darkTheme: ThemeData(brightness: Brightness.dark, colorSchemeSeed: offBlack),
+            themeMode: _themeMode,
+            home: CookbookScaffold(toggleTheme: toggleTheme, themeIcon: _themeIcon),
+        );
+    }
+}
+
+class CookbookScaffold extends StatefulWidget {
+    final VoidCallback toggleTheme;
+    final IconData themeIcon;
+
+    const CookbookScaffold({super.key, required this.toggleTheme, required this.themeIcon});
+
+    @override
+    State<CookbookScaffold> createState() => _CookbookScaffoldState();
+}
+
+class _CookbookScaffoldState extends State<CookbookScaffold> {   
     int _index = 0;
 
     List<PageWidget> pages = [
@@ -62,6 +104,15 @@ class _CookbookScaffold extends State<CookbookScaffold> {
                     mainBody(),
                 ],
             ),
+            floatingActionButton: SizedBox(
+                width: 70,
+                height: 70,
+                child: FloatingActionButton(
+                    onPressed: widget.toggleTheme,
+                    tooltip: "Toggle Theme Mode",
+                    child: Icon(widget.themeIcon),
+                ),
+            ),
         );
     }
 
@@ -85,7 +136,7 @@ class _CookbookScaffold extends State<CookbookScaffold> {
               navigationButton(pages[1]),
               navigationButton(pages[2]),
             ]
-          )
+          ),
         );
   }
 

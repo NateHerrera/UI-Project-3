@@ -18,11 +18,6 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
                 child: 
                     Text('Your cart is empty'),
                 ),
-            floatingActionButton: FloatingActionButton(
-                onPressed: () {},
-                tooltip: 'Add item',
-                child: const Icon(Icons.add_shopping_cart),
-            ),
         );
     }
 }

@@ -17,11 +17,6 @@ class _AddRecipePageState extends State<AddRecipePage> {
                 child: 
                     Text('Add Recipe'),
                 ),
-            floatingActionButton: FloatingActionButton(
-                onPressed: () {},
-                tooltip: 'Add Recipe',
-                child: const Icon(Icons.add_shopping_cart),
-            ),
         );
     }
 }
