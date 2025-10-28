@@ -1,104 +1,109 @@
+import 'package:cookbook/addRecipe.dart';
+import 'package:cookbook/cookbook.dart';
+import 'package:cookbook/shoppingList.dart';
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const MainApp());
+    runApp(const MainApp());
 }
 
 class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+    const MainApp({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: CookbookLayout(),
-    );
-  }
+    @override
+    Widget build(BuildContext context) {
+        return const MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: 'Cookbook',
+            home: CookbookScaffold(),
+        );
+    }
 }
 
-class CookbookLayout extends StatelessWidget {
-  const CookbookLayout({super.key});
+class CookbookScaffold extends StatefulWidget {
+    const CookbookScaffold({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Row(
-        children: [
-          // left side
-          Container(
-            width: 220,
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              border: Border.all(color: Colors.black, width: 1),
+    @override
+    State<CookbookScaffold> createState() => _CookbookScaffold();
+}
+
+class PageWidget {
+    final int index;
+    final Widget page;
+    final String navText;
+    final IconData navIcon;
+
+    PageWidget({required this.index, required this.page, required this.navText, required this.navIcon}); 
+}
+
+class _CookbookScaffold extends State<CookbookScaffold> {
+    int _index = 0;
+
+    List<PageWidget> pages = [
+        PageWidget(index: 0, page: CookbookPage(), navText: "Cook Book", navIcon: Icons.menu_book),
+        PageWidget(index: 1, page: AddRecipePage(), navText: "Add Recipe", navIcon: Icons.add_box),
+        PageWidget(index: 2, page: ShoppingListPage(), navText: "Shopping List", navIcon: Icons.shopping_cart),
+    ];
+
+    void select(int i) {
+        setState(() {
+          _index = i;
+        });
+    }
+
+    @override
+    Widget build(BuildContext context) {
+        return Scaffold(
+            body: Row(
+                children: [
+                    // Left Side
+                    sideNavigationBar(),
+                    // Right Side
+                    mainBody(),
+                ],
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                OutlinedButton.icon(
-                  onPressed: cookBookButton,
-                  style: OutlinedButton.styleFrom(
-                    alignment: Alignment.centerLeft,
-                    shape: RoundedRectangleBorder(),
-                    padding: const EdgeInsets.all(25),
-                  ),
-                  icon: const Icon(Icons.menu_book, color: Colors.black),
-                  label: const Text(
-                    'Cook Book',
-                    style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                ),
-                OutlinedButton.icon(
-                  onPressed: addRecipe,
-                  style: OutlinedButton.styleFrom(
-                    alignment: Alignment.centerLeft,
-                    shape: RoundedRectangleBorder(),
-                    padding: const EdgeInsets.all(25),
-                  ),
-                  icon: const Icon(Icons.add_box, color: Colors.black),
-                  label: const Text(
-                    'Add Recipes',
-                    style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                ),
-                OutlinedButton.icon(
-                  onPressed: shoppingList,
-                  style: OutlinedButton.styleFrom(
-                    alignment: Alignment.centerLeft,
-                    shape: RoundedRectangleBorder(),
-                    padding: const EdgeInsets.all(25),
-                  ),
-                  icon: const Icon(Icons.shopping_cart, color: Colors.black),
-                  label: const Text(
-                    'Shopping List',
-                    style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                ),
-              ]
-            )
+        );
+    }
+
+    Expanded mainBody() {
+        return Expanded(
+            child: IndexedStack(index: _index, children: pages.map((p) => p.page).toList())
+        );
+    }
+
+  Container sideNavigationBar() {
+    return Container(
+          width: 220,
+          decoration: BoxDecoration(
+            color: Colors.grey[300],
+            border: Border.all(color: Colors.black, width: 1),
           ),
-          Expanded(
-            // right side
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                border: Border.all(color: Colors.black, width: 1),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              navigationButton(pages[0]),
+              navigationButton(pages[1]),
+              navigationButton(pages[2]),
+            ]
+          )
+        );
   }
-}
 
-void cookBookButton() {
-  print("Cook Book");
-}
-
-void addRecipe() {
-  print("Add Recipe");
-}
-
-void shoppingList() {
-  print("Shopping List");
+    OutlinedButton navigationButton(PageWidget page) {
+        return OutlinedButton.icon(
+            onPressed:() {
+                select(page.index);
+            },
+            style: OutlinedButton.styleFrom(
+                alignment: Alignment.centerLeft,
+                shape: RoundedRectangleBorder(),
+                padding: const EdgeInsets.all(25),
+            ),
+            icon: Icon(page.navIcon, color: Colors.black),
+            label: Text(
+                page.navText,
+                style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+        );
+    }
 }
