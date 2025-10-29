@@ -10,6 +10,8 @@ Color offBlack = Color.fromARGB(255, 34, 34, 59);
 Color offWhite =  Color.fromARGB(255, 242, 233, 228);
 
 List<Recipe> recipes = [];
+// Notifier to let pages listen for changes to the recipes list.
+ValueNotifier<List<Recipe>> recipesNotifier = ValueNotifier<List<Recipe>>(recipes);
 
 class PageWidget {
     final int index;
@@ -24,8 +26,9 @@ class Recipe {
     final String name;
     final List<String> ingredients;
     final String instructions;
+    int quantity;
 
-    Recipe({required this.name, required this.ingredients, required this.instructions});
+    Recipe({required this.name, required this.ingredients, required this.instructions, this.quantity = 0});
 }
 
 void main() {
@@ -94,27 +97,9 @@ class _CookbookScaffoldState extends State<CookbookScaffold> {
           _index = i;
         });
     }
-    @override
-    void initState() {
-        print("object");
-        super.initState();
-        _logRecipes();
-    }
-
-    void _logRecipes() {
-        if (recipes.isNotEmpty) {
-            for (Recipe recipe in recipes) {
-                print("Recipe Name: ${recipe.name}");
-                print("Ingredients: \n${recipe.ingredients}");
-                print("Instructions: ${recipe.instructions}");
-                print("\n");
-            }
-        }
-    }
 
     @override
     Widget build(BuildContext context) {
-        _logRecipes();
         return Scaffold(
             body: Row(
                 children: [
@@ -143,23 +128,23 @@ class _CookbookScaffoldState extends State<CookbookScaffold> {
         );
     }
 
-  Container sideNavigationBar() {
-    return Container(
-          width: 220,
-          decoration: BoxDecoration(
-            color: Colors.grey[300],
-            border: Border.all(color: Colors.black, width: 1),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              navigationButton(pages[0]),
-              navigationButton(pages[1]),
-              navigationButton(pages[2]),
-            ]
-          ),
+    Container sideNavigationBar() {
+        return Container(
+            width: 220,
+            decoration: BoxDecoration(
+                color: Colors.grey[300],
+                border: Border.all(color: Colors.black, width: 1),
+            ),
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                navigationButton(pages[0]),
+                navigationButton(pages[1]),
+                navigationButton(pages[2]),
+                ]
+            ),
         );
-  }
+    }
 
     OutlinedButton navigationButton(PageWidget page) {
         return OutlinedButton.icon(

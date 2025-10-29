@@ -53,6 +53,8 @@ class _AddRecipePageState extends State<AddRecipePage> {
             _instructionsController.clear();
             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Recipe Successfully Added')));
         });
+        // Notify other pages
+        recipesNotifier.value = List<Recipe>.from(recipes);
     }
 
     @override
@@ -147,6 +149,9 @@ class _AddRecipePageState extends State<AddRecipePage> {
 
     ListTile recipeIngredientsDeleteSection(String ing, int index) {
         return ListTile(
+            leading: SizedBox(
+              child: Text('•', style: TextStyle(fontSize: 24)),
+            ),
             title: Text(ing),
             trailing: IconButton(
                 icon: const Icon(Icons.delete_outline),
@@ -173,7 +178,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
 
     Padding addRecipeSection(BuildContext context) {
         return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12),
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 100),
             child: ElevatedButton(
                 onPressed: () => _addRecipe(context),
                 child: const Padding(

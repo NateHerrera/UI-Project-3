@@ -13,6 +13,8 @@ class _CookbookPageState extends State<CookbookPage> {
   void _deleteRecipeAt(int index) {
     setState(() {
       recipes.removeAt(index);
+      // Notify other pages
+      recipesNotifier.value = List<Recipe>.from(recipes);
     });
   }
 
@@ -29,16 +31,23 @@ class _CookbookPageState extends State<CookbookPage> {
       appBar: AppBar(title: const Text('Cook Book')),
       body: Padding(
         padding: const EdgeInsets.fromLTRB(25, 12, 25, 20),
-        child: recipes.isEmpty
-            ? const Center(child: Text('Cookbook is empty'))
-            : ListView.builder(
-                padding: const EdgeInsets.only(bottom: 12),
-                itemCount: recipes.length,
-                itemBuilder: (context, index) {
-                  final recipe = recipes[index];
-                  return recipeListItem(recipe, index, context);
-                },
-              ),
+        child: ValueListenableBuilder<List<Recipe>>(
+          valueListenable: recipesNotifier,
+          builder: (context, recipesValue, _) {
+            if (recipesValue.isEmpty) {
+              return const Center(child: Text('Cookbook is empty'));
+            }
+
+            return ListView.builder(
+              padding: const EdgeInsets.only(bottom: 12),
+              itemCount: recipesValue.length,
+              itemBuilder: (context, index) {
+                final recipe = recipesValue[index];
+                return recipeListItem(recipe, index, context);
+              },
+            );
+          },
+        ),
       ),
     );
   }
