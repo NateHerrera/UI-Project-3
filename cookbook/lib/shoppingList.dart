@@ -3,8 +3,6 @@ import 'dart:ui';
 import 'package:cookbook/main.dart';
 import 'package:flutter/material.dart';
 
-int _totalSelectedRecipes = 0;
-
 class ShoppingListPage extends StatefulWidget {
     const ShoppingListPage({super.key});
 
@@ -16,17 +14,20 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
 
     Map<String,int> aggregateIngredients(List<Recipe> recipes) {
         final Map<String,int> counts = {};
-        for (final r in recipes) {
-            for (final raw in r.ingredients) {
-                final key = _normalizeIngredient(raw);
-                counts[key] = (counts[key] ?? 0) + 1;
+        for (final _recipe in recipes) {
+
+            if (_recipe.quantity <= 0) continue; // only count selected recipes in the cart
+
+            for (final ingredient in _recipe.ingredients) {
+                final key = _normalizeIngredientString(ingredient);
+                counts[key] = (counts[key] ?? 0) + _recipe.quantity;
             }
         }
         return counts;
     }
 
-    String _normalizeIngredient(String s) {
-        return s.trim().toLowerCase().replaceAll(RegExp(r'[.,]'), '');
+    String _normalizeIngredientString(String s) {
+        return s.trim().toLowerCase();
     }
 
     void _addRecipeToCart(Recipe recipe) {
@@ -38,7 +39,6 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
 
         setState(() {
             recipes[existingIndex].quantity += 1;
-            _totalSelectedRecipes += 1;
         });
         // Notify other pages
         recipesNotifier.value = List<Recipe>.from(recipes);
@@ -52,9 +52,13 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
         }
 
         setState(() {
-            // recipes[existingIndex].quantity = clampDouble(recipes[existingIndex].quantity.toDouble(), 0, double.maxFinite).toInt();
-            recipes[existingIndex].quantity -= 1;
-            _totalSelectedRecipes -= 1;
+            // Clamp quantity
+            final current = recipes[existingIndex].quantity;
+            if (current > 0) {
+                recipes[existingIndex].quantity = current - 1;
+            } else {
+                recipes[existingIndex].quantity = 0;
+            }
         });
         recipesNotifier.value = List<Recipe>.from(recipes);
     }
@@ -160,10 +164,11 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
     }
 
     Column neededIngredientsSection(List<Recipe> currentRecipes) {
+        final int totalSelected = currentRecipes.fold<int>(0, (sum, r) => sum + r.quantity);
+        if (totalSelected <= 0) return Column();
+
         final needed = aggregateIngredients(currentRecipes);
-        if (needed.isEmpty) {
-            return Column();
-        }
+        if (needed.isEmpty) return Column();
 
         final entries = needed.entries.toList();
 
@@ -178,7 +183,7 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
                     ),
                 ),
                 Card(
-                    margin: const EdgeInsets.fromLTRB(10, 0, 0, 15),
+                    margin: const EdgeInsets.fromLTRB(10, 0, 100, 15),
                     elevation: 2,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -190,14 +195,36 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: entries.map((e) {
-                                return ListTile(
-                                    contentPadding: EdgeInsets.zero,
-                                    leading: const Padding(
-                                        padding: EdgeInsets.only(top: 6.0),
-                                        child: Text('•', style: TextStyle(fontSize: 20)),
+                                return Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 4),
+                                    child: Row(
+                                        children: [
+                                            const Text('•', style: TextStyle(fontSize: 20)),
+                                            const SizedBox(width: 12),
+                                            Expanded(
+                                                child: Text(
+                                                    e.key,
+                                                    style: const TextStyle(fontSize: 16),
+                                                ),
+                                            ),
+                                            if (e.value > 0)
+                                                Container(
+                                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                                    decoration: BoxDecoration(
+                                                        color: Theme.of(context).colorScheme.primaryContainer,
+                                                        borderRadius: BorderRadius.circular(20),
+                                                    ),
+                                                    child: Text(
+                                                        'x${e.value}',
+                                                        style: TextStyle(
+                                                            fontWeight: FontWeight.bold,
+                                                            fontSize: 16,
+                                                            color: Theme.of(context).colorScheme.onPrimaryContainer,
+                                                        ),
+                                                    ),
+                                                ),
+                                        ],
                                     ),
-                                    title: Text(e.key),
-                                    trailing: e.value > 1 ? Text('x${e.value}', style: const TextStyle(fontWeight: FontWeight.bold)) : null,
                                 );
                             }).toList(),
                         ),
