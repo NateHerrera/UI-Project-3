@@ -13,7 +13,6 @@ class _CookbookPageState extends State<CookbookPage> {
   void _deleteRecipeAt(int index) {
     setState(() {
       recipes.removeAt(index);
-      // Notify other pages
       recipesNotifier.value = List<Recipe>.from(recipes);
     });
   }
@@ -52,41 +51,45 @@ class _CookbookPageState extends State<CookbookPage> {
     );
   }
 
-  Container recipeListItem(Recipe recipe, int index, BuildContext context) {
+  Card recipeListItem(Recipe recipe, int index, BuildContext context) {
     final int ingredientCount = recipe.ingredients.length;
 
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 6),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black,
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12), 
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: Colors.grey.shade300, width: 1),
       ),
       child: ListTile(
-        onTap: () => _viewRecipe(context, recipe),
-        contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        contentPadding: const EdgeInsets.all(16),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
         title: Text(
           recipe.name,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
         ),
         subtitle: Text(
           "$ingredientCount ingredients",
           style: const TextStyle(fontSize: 14),
         ),
         trailing: IconButton(
-          icon: const Icon(Icons.delete_outline, color: Colors.red),
+          icon: Icon(
+            Icons.delete_outline,
+            color: Theme.of(context).colorScheme.error,
+          ),
           onPressed: () => _deleteRecipeAt(index),
         ),
+        onTap: () => _viewRecipe(context, recipe),
       ),
     );
   }
 }
+
 
 class RecipeDetailPage extends StatelessWidget {
   final Recipe recipe;
